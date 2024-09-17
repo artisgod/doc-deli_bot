@@ -5,7 +5,8 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-
+    # sudo apt install libraspberrypi-bin b4l-utils ros-foxy-v4l2-camera
+    # sudo apt install ros-foxy-image-transport-plugins ros-foxy-rqt-image-view
 
     return LaunchDescription([
 
