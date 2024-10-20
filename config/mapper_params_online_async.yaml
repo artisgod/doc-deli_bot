@@ -2,72 +2,70 @@ slam_toolbox:
   ros__parameters:
 
     # Plugin params
-    solver_plugin: solver_plugins::CeresSolver
-    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
-    ceres_preconditioner: SCHUR_JACOBI
-    ceres_trust_strategy: LEVENBERG_MARQUARDT
-    ceres_dogleg_type: TRADITIONAL_DOGLEG
-    ceres_loss_function: None
+    solver_plugin: solver_plugins::CeresSolver  # ใช้ปลั๊กอิน CeresSolver สำหรับแก้สมการในการสร้างแผนที่
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY  # ใช้วิธีการแก้ปัญหาแบบ SPARSE_NORMAL_CHOLESKY สำหรับกราฟขนาดใหญ่
+    ceres_preconditioner: SCHUR_JACOBI  # เพิ่มประสิทธิภาพด้วย Schur-Jacobi
+    ceres_trust_strategy: LEVENBERG_MARQUARDT  # ใช้กลยุทธ์ Levenberg-Marquardt สำหรับการเพิ่มประสิทธิภาพ
+    ceres_dogleg_type: TRADITIONAL_DOGLEG  # ใช้ traditional dogleg ในการแก้ปัญหา
+    ceres_loss_function: None  # ไม่ใช้ฟังก์ชันการสูญเสีย
 
     # ROS Parameters
-    odom_frame: odom
-    map_frame: map
-    base_frame: base_footprint
-    scan_topic: /scan
-    mode: localization
+    odom_frame: odom  # กำหนดเฟรม odometry
+    map_frame: map  # กำหนดเฟรมแผนที่
+    base_frame: base_footprint  # กำหนดเฟรมฐานของหุ่นยนต์
+    scan_topic: /scan  # ใช้ข้อมูลจากเซนเซอร์ LIDAR ที่ topic /scan
+    mode: mapping  # ตั้งค่าโหมดเป็นการสร้างแผนที่
 
-    # if you'd like to immediately start continuing a map at a given pose
-    # or at the dock, but they are mutually exclusive, if pose is given
-    # will use pose
-    map_file_name: /home/dev/dev_ws/my_map_serial
+    # สำหรับนำทาง NAV2
+    # map_file_name: /home/narongsak/dev_ws/{map}
     # map_start_pose: [0.0, 0.0, 0.0]
-    map_start_at_dock: true
+    # map_start_at_dock: true
 
-    debug_logging: false
-    throttle_scans: 1
-    transform_publish_period: 0.02 #if 0 never publishes odometry
-    map_update_interval: 5.0
-    resolution: 0.05
-    max_laser_range: 20.0 #for rastering images
-    minimum_time_interval: 0.5
-    transform_timeout: 0.2
-    tf_buffer_duration: 30.
-    stack_size_to_use: 40000000 #// program needs a larger stack size to serialize large maps
-    enable_interactive_mode: true
+    debug_logging: false  # ปิดการบันทึกข้อมูล debug
+    throttle_scans: 0  # ใช้ทุกการสแกนจาก LIDAR
+    transform_publish_period: 0.05  # เผยแพร่ TF ระหว่าง odom กับ map ทุกๆ x วินาที
+    map_update_interval: 1.0  # อัปเดตแผนที่ทุกๆ x วินาที
+    resolution: 0.05  # ความละเอียดของแผนที่ต่อเซลล์
+    max_laser_range: 3.5
+    
+    minimum_time_interval: 0.5  # ระยะเวลาขั้นต่ำระหว่างการอัปเดตข้อมูล
+    transform_timeout: 0.2  # เวลาหมดอายุสำหรับ TF หากไม่มีการอัปเดต
+    tf_buffer_duration: 30.  # ระยะเวลาบัฟเฟอร์ข้อมูล TF
+    stack_size_to_use: 40000000  # ขนาด stack ที่ใช้สำหรับการสร้างแผนที่ขนาดใหญ่
+    enable_interactive_mode: true  # เปิดโหมดโต้ตอบเพื่อปรับปรุงแผนที่ผ่าน GUI
 
     # General Parameters
-    use_scan_matching: true
-    use_scan_barycenter: true
-    minimum_travel_distance: 0.5
-    minimum_travel_heading: 0.5
-    scan_buffer_size: 10
-    scan_buffer_maximum_scan_distance: 10.0
-    link_match_minimum_response_fine: 0.1  
-    link_scan_maximum_distance: 1.5
-    loop_search_maximum_distance: 3.0
-    do_loop_closing: true 
-    loop_match_minimum_chain_size: 10           
-    loop_match_maximum_variance_coarse: 3.0  
-    loop_match_minimum_response_coarse: 0.35    
-    loop_match_minimum_response_fine: 0.45
+    use_scan_matching: true  # ใช้การจับคู่สแกนเพื่อช่วยในการสร้างแผนที่
+    use_scan_barycenter: true  # ใช้จุดศูนย์กลางสแกนในการจับคู่
+    minimum_travel_distance: 0.4  # ระยะหุ่นยนต์ต้องเคลื่อนที่ x เมตรก่อนอัปเดตแผนที่ | 0.4 > error
+    minimum_travel_heading: 0.4  # ระยะหุ่นยนต์ต้องเคลื่อนที่ x เรเดียนก่อนอัปเดตแผนที่ | 0.4 > error
+    scan_buffer_size: 10  # บัฟเฟอร์ข้อมูลสแกนสำหรับการสร้างแผนที่
+    scan_buffer_maximum_scan_distance: 3.0  # ระยะสูงสุดในการบัฟเฟอร์สแกนข้อมูล
+    link_match_minimum_response_fine: 0.1  # ค่าการตอบสนองขั้นต่ำสำหรับการจับคู่ละเอียด
+    link_scan_maximum_distance: 1.0  # ระยะสูงสุดสำหรับการจับคู่สแกน
+    loop_search_maximum_distance: 3.0  # ระยะสูงสุดในการค้นหา loop closure
+    do_loop_closing: true  # ปิดการทำ loop closure เพื่อปรับปรุงความแม่นยำของแผนที่
+    loop_match_minimum_chain_size: 10  # จำนวนขั้นต่ำของการจับคู่แบบโซ่สำหรับ loop closure
+    loop_match_maximum_variance_coarse: 3.0  # ความคลาดเคลื่อนสูงสุดสำหรับการจับคู่หยาบ
+    loop_match_minimum_response_coarse: 0.3  # ค่าการตอบสนองขั้นต่ำสำหรับการจับคู่หยาบ
+    loop_match_minimum_response_fine: 0.45  # ค่าการตอบสนองขั้นต่ำสำหรับการจับคู่ละเอียด
 
-    # Correlation Parameters - Correlation Parameters
-    correlation_search_space_dimension: 0.5
-    correlation_search_space_resolution: 0.01
-    correlation_search_space_smear_deviation: 0.1 
+    # Correlation Parameters
+    correlation_search_space_dimension: 0.5  # ขนาดพื้นที่ค้นหาการจับคู่ข้อมูลสแกน
+    correlation_search_space_resolution: 0.05  # ความละเอียดของการค้นหา
+    correlation_search_space_smear_deviation: 0.1  # ค่าความคลาดเคลื่อนในการค้นหาความสัมพันธ์
 
-    # Correlation Parameters - Loop Closure Parameters
-    loop_search_space_dimension: 8.0
-    loop_search_space_resolution: 0.05
-    loop_search_space_smear_deviation: 0.03
+    # Correlation Parameters - Loop Closure
+    loop_search_space_dimension: 8.0  # ขนาดพื้นที่ค้นหาสำหรับ loop closure
+    loop_search_space_resolution: 0.05  # ความละเอียดของการค้นหา loop closure
+    loop_search_space_smear_deviation: 0.03  # ค่าความคลาดเคลื่อนในการค้นหา loop closure
 
     # Scan Matcher Parameters
-    distance_variance_penalty: 0.5      
-    angle_variance_penalty: 1.0    
-
-    fine_search_angle_offset: 0.00349     
-    coarse_search_angle_offset: 0.349   
-    coarse_angle_resolution: 0.0349        
-    minimum_angle_penalty: 0.9
-    minimum_distance_penalty: 0.5
-    use_response_expansion: true
+    distance_variance_penalty: 0.5  # ค่าปรับความคลาดเคลื่อนของระยะทาง
+    minimum_distance_penalty: 0.5  # ค่าปรับความคลาดเคลื่อนต่ำสุดสำหรับระยะทาง
+    angle_variance_penalty: 1.0  # ค่าปรับความคลาดเคลื่อนของมุม
+    minimum_angle_penalty: 0.9  # ค่าปรับความคลาดเคลื่อนต่ำสุดสำหรับมุม
+    fine_search_angle_offset: 0.00349  # ค่าการชดเชยมุมละเอียดในการค้นหา
+    coarse_search_angle_offset: 0.349  # ค่าการชดเชยมุมหยาบ
+    coarse_angle_resolution: 0.0349  # ความละเอียดของมุมหยาบในการค้นหา
+    use_response_expansion: true  # ใช้การขยายค่าการตอบสนองเพื่อปรับปรุงความแม่นยำ
